@@ -1,0 +1,59 @@
+services:
+  litellm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    ports:
+      - "${LITELLM_PORT}:4000"
+
+    env_file:
+      - .env
+
+    volumes:
+      - ./config.yml:/app/config.yml:ro
+
+    depends_on:
+      ollama-init:
+        condition: service_completed_successfully
+
+  ollama:
+    image: ollama/ollama:latest
+
+    ports:
+      - "${OLLAMA_PORT}:11434"
+
+    volumes:
+      - ollama_data:/root/.ollama
+
+  ollama-init:
+    image: ollama/ollama:latest
+
+    depends_on:
+      - ollama
+
+    volumes:
+      - ollama_data:/root/.ollama
+
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+
+    entrypoint: >
+      /bin/sh -c "
+        until ollama list > /dev/null 2>&1; do
+          echo 'Waiting for Ollama...';
+          sleep 2;
+        done;
+        ollama pull ${OLLAMA_MODEL};
+        echo 'Warming up model...';
+        ollama run ${OLLAMA_MODEL} 'hello' > /dev/null 2>&1;
+        echo 'Model ready.'
+      "
+
+    env_file:
+      - .env
+
+    restart: "no"
+
+volumes:
+  ollama_data:

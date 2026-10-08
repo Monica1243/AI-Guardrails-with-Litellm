@@ -1,0 +1,25 @@
+model_list:
+  - model_name: llama3.2
+    litellm_params:
+      model: ollama/llama3.2:3b
+      api_base: http://ollama:11434
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+litellm_settings:
+  callbacks:
+    - custom_guardrails.guardrails_callback
+
+pipeline:
+  failure_mode: closed
+
+  prebuilt_validators:
+    - name: pii
+      action: block
+      timeout: 1000
+
+  ai_validators:
+    - name: prompt_injection
+      action: block
+      timeout: 120000

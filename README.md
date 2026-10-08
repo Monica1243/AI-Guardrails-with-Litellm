@@ -1,6 +1,6 @@
-# guardrails-framework
+# AI Guardrails
 
-A Python-based LLM guardrails framework integrated with the LiteLLM proxy. It intercepts requests before they reach an upstream model and runs them through a configurable validation pipeline — prebuilt validators first, then AI-powered validators.
+A Python-based LLM guardrails integrated with the LiteLLM proxy.
 
 ---
 
@@ -37,27 +37,6 @@ Incoming LLM Request
 | `warned` | Input passes through; warning recorded |
 | `redacted` | Modified input passes through downstream stages |
 | `blocked` | Pipeline stops; request is rejected |
-
----
-
-## Configuration
-
-All runtime behavior is controlled by `config.yml`.
-
-```yaml
-guardrails:
-  failure_mode: closed        # "closed" = block on validator error, "open" = warn
-
-  prebuilt_validators:
-    - name: pii
-      action: redact          # warn | redact | block
-      timeout: 1000           # ms
-
-  ai_validators:
-    - name: prompt_injection
-      action: block           # warn | redact | block
-      timeout: 120000         # ms
-```
 
 ---
 
